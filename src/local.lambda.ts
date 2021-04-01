@@ -1,6 +1,7 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { HttpHeaders, LambdaHandler, RequestEvent } from './types';
 import { Context } from 'aws-lambda';
+import HTTPMethod from 'http-method-enum';
 
 const DefaultPort = 8000;
 
@@ -24,7 +25,7 @@ export class LocalLambda {
       request.on('end', async () => {
         const req: RequestEvent = {
           path: request.url!,
-          httpMethod: request.method,
+          httpMethod: request.method as HTTPMethod,
           method: request.method,
           headers: request.headers as HttpHeaders,
           body: data,

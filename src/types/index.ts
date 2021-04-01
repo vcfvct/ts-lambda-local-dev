@@ -1,8 +1,9 @@
 import { Context } from 'aws-lambda';
+import { HTTPMethod } from 'http-method-enum';
 
 export interface RequestEvent {
   requestContext?: any;
-  httpMethod?: string;
+  httpMethod?: HTTPMethod;
   method?: string;
   path?: string;
   headers?: HttpHeaders;

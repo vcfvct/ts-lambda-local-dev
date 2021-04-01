@@ -29,7 +29,7 @@ localLambda.run();
 ```
 
 ## Debug and Watch file change and auto-reload
-This package included `ts-node-dev` as a peer dependency which should be auto installed with npm >7.  In case it is *NOT* installed, do `npm i ts-node-dev -D`
+This package included `ts-node-dev` as a dependency which would watch file change and use the ts-node compilation result to trigger reload.
 
 ### VSCode
 assume your `local.server.ts` is in `src/`. include below config in your `.vscode/launch.json`.
