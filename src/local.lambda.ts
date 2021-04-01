@@ -36,7 +36,7 @@ export class LocalLambda {
 
     });
 
-    server.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at ${new Date().toLocaleString()}`));
+    server.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
 }
 

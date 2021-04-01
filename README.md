@@ -20,7 +20,7 @@ import { handler } from './index'
 
 // context is provided as optional field in config.
 const config: LocalLambdaConfig = {
-  handler: handler,
+  handler: handler, // if type is not compatible, do `handler: handler as any`
   port: 8000, // optional, default to 8000
 }
 
