@@ -14,7 +14,7 @@
       "esnext.asynciterable",
       "dom"
     ],
-    "outDir": "tsc-dist",
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
       "*": [

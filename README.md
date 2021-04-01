@@ -28,10 +28,8 @@ const localLambda = new LocalLambda(config);
 localLambda.run();
 ```
 
-## Debug
-
-## Watch file change and auto-reload
-This package included `ts-node-dev` as a peer dependency which should be auto installed with npm >7.
+## Debug and Watch file change and auto-reload
+This package included `ts-node-dev` as a peer dependency which should be auto installed with npm >7.  In case it is *NOT* installed, do `npm i ts-node-dev -D`
 
 ### VSCode
 assume your `local.server.ts` is in `src/`. include below config in your `.vscode/launch.json`.
@@ -64,7 +62,9 @@ assume your `local.server.ts` is in `src/`. include below config in your `.vscod
 
 ### JetBrain(WebStorm/IntellJ)
 in your Run/Debug Configuration, add a node.js config with below params:
-> JavaScript file ---> node_modules/ts-node-dev/lib/bin.js
-> Applicationi parameters ---> --respawn -- src/script/local.server.ts
+```
+ JavaScript file ---> node_modules/ts-node-dev/lib/bin.js
+ Application parameters ---> --respawn -- src/script/local.server.ts
+```
 
 ![Idea-Screenshot](/images/jetbrain-config.png?raw=true "jetbrain")

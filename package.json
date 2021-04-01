@@ -1,11 +1,14 @@
 {
   "name": "ts-lambda-local-dev",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "typescript lambda local development server",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "compile": "tsc -d --sourceMap",
-    "lint": "eslint --ext .ts src/"
+    "lint": "eslint --ext .ts src/",
+    "prepublishOnly": "npm run compile"
   },
   "keywords": [
     "typescript",
@@ -32,5 +35,4 @@
   "files": [
     "/dist"
   ]
-
 }
