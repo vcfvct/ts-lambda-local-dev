@@ -5,7 +5,7 @@ export interface RequestEvent {
   requestContext?: any;
   httpMethod?: HTTPMethod;
   method?: string;
-  path?: string;
+  path: string;
   headers?: HttpHeaders;
   body?: string;
   isBase64Encoded?: boolean;
