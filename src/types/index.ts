@@ -1,4 +1,5 @@
 import { Context } from 'aws-lambda';
+import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import { HTTPMethod } from 'http-method-enum';
 
 export interface RequestEvent {
@@ -6,18 +7,16 @@ export interface RequestEvent {
   httpMethod?: HTTPMethod;
   method?: string;
   path: string;
-  headers?: HttpHeaders;
+  headers?: IncomingHttpHeaders;
   body?: string;
   isBase64Encoded?: boolean;
 }
 
-export type HttpHeaders = { [key: string]: string | string[] };
-
 export interface LambdaResponse {
   statusCode: number;
-  headers?: HttpHeaders;
+  headers?: OutgoingHttpHeaders;
   isBase64Encoded?: boolean;
   body?: any;
 }
 
-export type LambdaHandler = (req: RequestEvent, context?: Context) => Promise<LambdaResponse>;
+export type LambdaHandler = (req: RequestEvent, context: Context) => Promise<LambdaResponse>;

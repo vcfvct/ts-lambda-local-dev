@@ -1,5 +1,5 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { HttpHeaders, LambdaHandler, RequestEvent } from './types';
+import { LambdaHandler, RequestEvent } from './types';
 import { Context } from 'aws-lambda';
 import HTTPMethod from 'http-method-enum';
 
@@ -8,12 +8,12 @@ const DefaultPort = 8000;
 export class LocalLambda {
   handler: LambdaHandler;
   port: number;
-  context?: Context;
+  context: Context;
 
   constructor(config: LocalLambdaConfig) {
     this.handler = config.handler;
     this.port = config.port ?? DefaultPort;
-    this.context = config.context;
+    this.context = config.context || {} as Context;
   }
 
   run(): void {
@@ -27,7 +27,7 @@ export class LocalLambda {
           path: request.url!,
           httpMethod: request.method as HTTPMethod,
           method: request.method,
-          headers: request.headers as HttpHeaders,
+          headers: request.headers,
           body: data,
         };
         const rs = await this.handler(req, this.context);
