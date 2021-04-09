@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "compile": "tsc -d --sourceMap",
+    "compile": "rm -rf dist/ && tsc -d --sourceMap",
     "lint": "eslint --ext .ts src/",
     "prepublishOnly": "npm run compile"
   },
