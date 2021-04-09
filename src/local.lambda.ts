@@ -32,7 +32,8 @@ export class LocalLambda {
         };
         const rs = await this.handler(req, this.context);
         response.statusCode = rs.statusCode;
-        response.writeHead(rs.statusCode, rs.headers).end(rs.body);
+        response.writeHead(rs.statusCode, rs.headers);
+        response.end(rs.body);
       });
 
     });
