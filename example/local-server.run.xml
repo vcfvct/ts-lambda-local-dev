@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="local-server" type="NodeJSConfigurationType" application-parameters="--respawn -- src/script/local.server.ts" path-to-js-file="node_modules/ts-node-dev/lib/bin.js" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
+
