@@ -1,6 +1,6 @@
 {
   "name": "ts-lambda-local-dev",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "typescript lambda local development server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,6 +10,11 @@
     "lint": "eslint --ext .ts src/",
     "prepublishOnly": "npm run compile"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vcfvct/ts-lambda-local-dev.git"
+  },
+  "homepage": "https://github.com/vcfvct/ts-lambda-local-dev/blob/master/README.md",
   "keywords": [
     "typescript",
     "lambda",
