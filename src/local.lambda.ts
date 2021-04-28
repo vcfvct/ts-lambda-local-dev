@@ -1,7 +1,8 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { LambdaHandler, RequestEvent } from './types';
 import { Context } from 'aws-lambda';
+import * as url from 'url';
 import HTTPMethod from 'http-method-enum';
+import { LambdaHandler, RequestEvent } from './types';
 
 const DefaultPort = 8000;
 
@@ -19,15 +20,18 @@ export class LocalLambda {
   run(): void {
     const server = createServer((request: IncomingMessage, response: ServerResponse) => {
       let data = '';
+      const parsedUrl = url.parse(request.url!, true);
+
       request.on('data', chunk => {
         data += chunk;
       });
       request.on('end', async () => {
         const req: RequestEvent = {
-          path: request.url!,
+          path: parsedUrl.pathname!,
           httpMethod: request.method as HTTPMethod,
           method: request.method,
           headers: request.headers,
+          queryStringParameters: parsedUrl.query,
           body: data,
         };
         const rs = await this.handler(req, this.context);
