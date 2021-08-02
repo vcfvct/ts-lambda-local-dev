@@ -10,11 +10,13 @@ export class LocalLambda {
   handler: LambdaHandler;
   port: number;
   context: Context;
+  enableCORS: boolean;
 
   constructor(config: LocalLambdaConfig) {
     this.handler = config.handler;
     this.port = config.port ?? DefaultPort;
     this.context = config.context || {} as Context;
+    this.enableCORS = config.enableCORS ?? true;
   }
 
   run(): void {
@@ -26,6 +28,8 @@ export class LocalLambda {
         data += chunk;
       });
       request.on('end', async () => {
+        if (this.enableCORS && request.method === 'OPTIONS') return this.handleCORS(response);
+
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
           httpMethod: request.method as HTTPMethod,
@@ -44,10 +48,20 @@ export class LocalLambda {
 
     server.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
+
+  handleCORS(res: ServerResponse): void {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Request-Method', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.writeHead(200);
+    res.end();
+  }
 }
 
 export interface LocalLambdaConfig {
   handler: LambdaHandler;
   port?: number;
   context?: Context;
+  enableCORS?: boolean;
 }
