@@ -1,6 +1,6 @@
 {
   "name": "ts-lambda-local-dev",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "typescript lambda local development server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

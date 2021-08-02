@@ -28,7 +28,12 @@ export class LocalLambda {
         data += chunk;
       });
       request.on('end', async () => {
-        if (this.enableCORS && request.method === 'OPTIONS') return this.handleCORS(response);
+        if (this.enableCORS && request.method === 'OPTIONS') {
+          this.setCORSHeaders(response);
+          response.writeHead(200);
+          response.end();
+          return; // for complex requests(POST etc)' CORS header
+        }
 
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
@@ -39,6 +44,8 @@ export class LocalLambda {
           body: data,
         };
         const rs = await this.handler(req, this.context);
+        // for simple requests' CORS header
+        this.enableCORS && this.setCORSHeaders(response);
         response.statusCode = rs.statusCode;
         response.writeHead(rs.statusCode, rs.headers);
         response.end(rs.body);
@@ -49,13 +56,11 @@ export class LocalLambda {
     server.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
 
-  handleCORS(res: ServerResponse): void {
+  setCORSHeaders(res: ServerResponse): void {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', '*');
-    res.writeHead(200);
-    res.end();
   }
 }
 
