@@ -48,7 +48,8 @@ export class LocalLambda {
         this.enableCORS && this.setCORSHeaders(response);
         response.statusCode = rs.statusCode;
         response.writeHead(rs.statusCode, rs.headers);
-        response.end(rs.body);
+        const decodedResponseBody = Buffer.from(rs.body, rs.isBase64Encoded ? 'base64' : 'utf8');
+        response.end(decodedResponseBody);
       });
 
     });
