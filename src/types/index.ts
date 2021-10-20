@@ -9,14 +9,18 @@ export interface RequestEvent {
   method?: string;
   path: string;
   headers?: IncomingHttpHeaders;
+  multiValueHeaders?: { [name: string]: string[] };
   body?: string;
   queryStringParameters?: ParsedUrlQuery;
+  multiValueQueryStringParameters?: { [name: string]: string[] };
   isBase64Encoded?: boolean;
 }
 
 export interface LambdaResponse {
   statusCode: number;
+  statusDescription?: string;
   headers?: OutgoingHttpHeaders;
+  multiValueHeaders?: { [name: string]: string[] };
   isBase64Encoded?: boolean;
   body?: any;
 }
