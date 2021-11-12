@@ -40,7 +40,7 @@ export class LocalLambda {
           httpMethod: request.method as HTTPMethod,
           method: request.method,
           headers: request.headers,
-          queryStringParameters: parsedUrl.query,
+          queryStringParameters: parsedUrl.query as Record<string, string>,
           body: data,
         };
         const rs = await this.handler(req, this.context);
