@@ -11,7 +11,7 @@ export interface RequestEvent {
   headers?: IncomingHttpHeaders;
   multiValueHeaders?: { [name: string]: string[] };
   body?: string;
-  queryStringParameters?: ParsedUrlQuery;
+  queryStringParameters?: Record<string, string>;
   multiValueQueryStringParameters?: { [name: string]: string[] };
   isBase64Encoded?: boolean;
 }
