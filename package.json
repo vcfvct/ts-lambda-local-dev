@@ -1,6 +1,6 @@
 {
   "name": "ts-lambda-local-dev",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "typescript lambda local development server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,7 +36,7 @@
   "dependencies": {
     "@types/aws-lambda": "^8.10.73",
     "http-method-enum": "^1.0.0",
-    "ts-node-dev": "^1.1.6"
+    "ts-node-dev": "^2.0.0"
   },
   "files": [
     "/dist",
