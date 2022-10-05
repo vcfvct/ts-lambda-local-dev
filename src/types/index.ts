@@ -1,7 +1,6 @@
 import { Context } from 'aws-lambda';
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
 import { HTTPMethod } from 'http-method-enum';
-import { ParsedUrlQuery } from 'node:querystring';
 
 export interface RequestEvent {
   requestContext?: any;
@@ -9,14 +8,18 @@ export interface RequestEvent {
   method?: string;
   path: string;
   headers?: IncomingHttpHeaders;
+  multiValueHeaders?: { [name: string]: string[] };
   body?: string;
-  queryStringParameters?: ParsedUrlQuery;
+  queryStringParameters?: Record<string, string>;
+  multiValueQueryStringParameters?: { [name: string]: string[] };
   isBase64Encoded?: boolean;
 }
 
 export interface LambdaResponse {
   statusCode: number;
+  statusDescription?: string;
   headers?: OutgoingHttpHeaders;
+  multiValueHeaders?: { [name: string]: string[] };
   isBase64Encoded?: boolean;
   body?: any;
 }
