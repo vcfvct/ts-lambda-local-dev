@@ -28,6 +28,8 @@ const localLambda = new LocalLambda(config);
 localLambda.run();
 ```
 
+`CORS` is enabled *by default*, you can pass in `enableCORS: false` to disable it.
+
 ## Debug and Watch file change and auto-reload
 This package included `ts-node-dev` as a dependency which would watch file change and use the ts-node compilation result to trigger reload. See the sample configurations in the `example/` directory of this repo for more details.
 
