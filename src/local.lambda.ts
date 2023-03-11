@@ -21,11 +21,11 @@ export class LocalLambda {
 
   run(): void {
     const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-      let data = '';
+      let data: Buffer[] = [];
       const parsedUrl = url.parse(request.url!, true);
 
       request.on('data', chunk => {
-        data += chunk;
+        data.push(chunk);
       });
       request.on('end', async () => {
         if (this.enableCORS && request.method === 'OPTIONS') {
@@ -34,14 +34,15 @@ export class LocalLambda {
           response.end();
           return; // for complex requests(POST etc)' CORS header
         }
-
+        let body = Buffer.concat(data);
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
           httpMethod: request.method as HTTPMethod,
           method: request.method,
           headers: request.headers,
           queryStringParameters: parsedUrl.query as Record<string, string>,
-          body: data,
+          body: body.toString('base64'),
+          isBase64Encoded: true,
         };
         const rs = await this.handler(req, this.context);
         // for simple requests' CORS header
