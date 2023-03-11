@@ -7,7 +7,7 @@ import { LambdaHandler, RequestEvent } from './types';
 const DefaultPort = 8000;
 
 // binary upload content-type headers
-const binaryContentTypeHeaders = [
+const defaultBinaryContentTypeHeaders = [
   'application/octet-stream',
   'image/png',
   'image/jpeg',
@@ -21,12 +21,14 @@ export class LocalLambda {
   port: number;
   context: Context;
   enableCORS: boolean;
+  binaryContentTypesOverride: string[];
 
   constructor(config: LocalLambdaConfig) {
     this.handler = config.handler;
     this.port = config.port ?? DefaultPort;
     this.context = config.context || {} as Context;
     this.enableCORS = config.enableCORS ?? true;
+    this.binaryContentTypesOverride = config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders;
   }
 
   run(): void {
@@ -45,7 +47,7 @@ export class LocalLambda {
           return; // for complex requests(POST etc)' CORS header
         }
         const contentType = request.headers['content-type'];
-        const isBinaryUpload = binaryContentTypeHeaders.includes(contentType ?? '');
+        const isBinaryUpload = this.binaryContentTypesOverride.includes(contentType ?? '');
         const body = Buffer.concat(data);
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
@@ -83,4 +85,6 @@ export interface LocalLambdaConfig {
   port?: number;
   context?: Context;
   enableCORS?: boolean;
+  // default binary content-type headers or override
+  binaryContentTypesOverride?: string[];
 }

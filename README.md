@@ -30,6 +30,8 @@ localLambda.run();
 
 `CORS` is enabled *by default*, you can pass in `enableCORS: false` to disable it.
 
+`binaryContentTypesOverride` is also enabled by default, you can pass in `binaryContentTypesOverride: []` to disable it or pass in your own list of content types that should be treated as binary content.
+
 ## Debug and Watch file change and auto-reload
 This package included `ts-node-dev` as a dependency which would watch file change and use the ts-node compilation result to trigger reload. See the sample configurations in the `example/` directory of this repo for more details.
 
