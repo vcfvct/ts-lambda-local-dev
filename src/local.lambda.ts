@@ -6,6 +6,16 @@ import { LambdaHandler, RequestEvent } from './types';
 
 const DefaultPort = 8000;
 
+// binary upload content-type headers
+const binaryContentTypeHeaders = [
+  'application/octet-stream',
+  'image/png',
+  'image/jpeg',
+  'image/gif',
+  'application/pdf',
+  'application/zip',
+];
+
 export class LocalLambda {
   handler: LambdaHandler;
   port: number;
@@ -21,7 +31,7 @@ export class LocalLambda {
 
   run(): void {
     const server = createServer((request: IncomingMessage, response: ServerResponse) => {
-      let data: Buffer[] = [];
+      const data: Buffer[] = [];
       const parsedUrl = url.parse(request.url!, true);
 
       request.on('data', chunk => {
@@ -34,15 +44,17 @@ export class LocalLambda {
           response.end();
           return; // for complex requests(POST etc)' CORS header
         }
-        let body = Buffer.concat(data);
+        const contentType = request.headers['content-type'];
+        const isBinaryUpload = binaryContentTypeHeaders.includes(contentType ?? '');
+        const body = Buffer.concat(data);
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
           httpMethod: request.method as HTTPMethod,
           method: request.method,
           headers: request.headers,
           queryStringParameters: parsedUrl.query as Record<string, string>,
-          body: body.toString('base64'),
-          isBase64Encoded: true,
+          body: isBinaryUpload ? body.toString('base64') : body.toString('utf8'),
+          isBase64Encoded: isBinaryUpload ? true : false,
         };
         const rs = await this.handler(req, this.context);
         // for simple requests' CORS header
