@@ -21,14 +21,14 @@ export class LocalLambda {
   port: number;
   context: Context;
   enableCORS: boolean;
-  binaryContentTypesOverride: string[];
+  binaryContentTypesOverride: Set<string>;
 
   constructor(config: LocalLambdaConfig) {
     this.handler = config.handler;
     this.port = config.port ?? DefaultPort;
     this.context = config.context || {} as Context;
     this.enableCORS = config.enableCORS ?? true;
-    this.binaryContentTypesOverride = config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders;
+    this.binaryContentTypesOverride = new Set(config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders);
   }
 
   run(): void {
@@ -47,7 +47,7 @@ export class LocalLambda {
           return; // for complex requests(POST etc)' CORS header
         }
         const contentType = request.headers['content-type'];
-        const isBinaryUpload = this.binaryContentTypesOverride.includes(contentType ?? '');
+        const isBinaryUpload = this.binaryContentTypesOverride.has(contentType as string);
         const body = Buffer.concat(data);
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
