@@ -1,10 +1,9 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { Context } from 'aws-lambda';
 import * as url from 'url';
 import HTTPMethod from 'http-method-enum';
 import { LambdaHandler, RequestEvent } from './types';
+import express, { Request, Response } from 'express';
 import { flattenArraysInJSON } from './utils';
-
 const DefaultPort = 8000;
 
 // binary upload content-type headers
@@ -17,12 +16,16 @@ const defaultBinaryContentTypeHeaders = [
   'application/zip',
 ];
 
+const DefaultPathParamsPattern = '/';
+
 export class LocalLambda {
   handler: LambdaHandler;
   port: number;
   context: Context;
   enableCORS: boolean;
   binaryContentTypesOverride: Set<string>;
+  pathParamsPattern: string | undefined;
+  app: express.Application;
 
   constructor(config: LocalLambdaConfig) {
     this.handler = config.handler;
@@ -30,10 +33,12 @@ export class LocalLambda {
     this.context = config.context || {} as Context;
     this.enableCORS = config.enableCORS ?? true;
     this.binaryContentTypesOverride = new Set(config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders);
+    this.pathParamsPattern = config.pathParamsPattern ?? DefaultPathParamsPattern;
+    this.app = express();
   }
 
   run(): void {
-    const server = createServer((request: IncomingMessage, response: ServerResponse) => {
+    this.app.all(`${this.pathParamsPattern}*`,async (request: Request, response: Response) => {
       const data: Buffer[] = [];
       const parsedUrl = url.parse(request.url!, true);
 
@@ -61,6 +66,7 @@ export class LocalLambda {
           queryStringParameters: flattenArraysInJSON(parsedUrl.query) as Record<string, string>,
           body: isBinaryUpload ? body.toString('base64') : body.toString('utf8'),
           isBase64Encoded: isBinaryUpload ? true : false,
+          pathParameters: request.params,
         };
         const rs = await this.handler(req, this.context);
         // for simple requests' CORS header
@@ -73,15 +79,16 @@ export class LocalLambda {
 
     });
 
-    server.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
+    this.app.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
 
-  setCORSHeaders(res: ServerResponse): void {
+  setCORSHeaders(res: Response): void {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', '*');
   }
+
 }
 
 export interface LocalLambdaConfig {
@@ -91,4 +98,5 @@ export interface LocalLambdaConfig {
   enableCORS?: boolean;
   // default binary content-type headers or override
   binaryContentTypesOverride?: string[];
+  pathParamsPattern ?: string;
 }

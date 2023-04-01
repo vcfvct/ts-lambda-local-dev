@@ -13,6 +13,7 @@ export interface RequestEvent {
   queryStringParameters?: Record<string, string>;
   multiValueQueryStringParameters?: { [name: string]: string[] };
   isBase64Encoded?: boolean;
+  pathParameters?: Record<string, string>;
 }
 
 export interface LambdaResponse {
