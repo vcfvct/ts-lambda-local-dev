@@ -24,7 +24,7 @@ export class LocalLambda {
   context: Context;
   enableCORS: boolean;
   binaryContentTypesOverride: Set<string>;
-  pathParamsPattern: string | undefined;
+  pathParamsPattern: string;
   app: express.Application;
 
   constructor(config: LocalLambdaConfig) {
