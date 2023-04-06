@@ -3,6 +3,7 @@ import { Context } from 'aws-lambda';
 import * as url from 'url';
 import HTTPMethod from 'http-method-enum';
 import { LambdaHandler, RequestEvent } from './types';
+import { flattenArraysInJSON } from './utils';
 
 const DefaultPort = 8000;
 
@@ -54,7 +55,10 @@ export class LocalLambda {
           httpMethod: request.method as HTTPMethod,
           method: request.method,
           headers: request.headers,
-          queryStringParameters: parsedUrl.query as Record<string, string>,
+          /* if duplicate queryParameters are present then API Gateway will flatten them into a comma-separated list
+             eg: ?a=1&a=2&a=3 will be parsed as { a: [1,2,3] } by url.parse and flattenArraysInJSON will convert it to { a: '1,2,3' } which is the same behavior as API Gateway
+          */
+          queryStringParameters: flattenArraysInJSON(parsedUrl.query) as Record<string, string>,
           body: isBinaryUpload ? body.toString('base64') : body.toString('utf8'),
           isBase64Encoded: isBinaryUpload ? true : false,
         };
