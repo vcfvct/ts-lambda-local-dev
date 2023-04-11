@@ -25,22 +25,27 @@ export class LocalLambda {
   enableCORS: boolean;
   binaryContentTypesOverride: Set<string>;
   pathParamsPattern: string;
+  defaultPath: string;
   app: express.Application;
   requestContext: Record<string, any>;
 
-  constructor(config: LocalLambdaConfig) {
+  constructor(config: LocalLambdaConfig, app?: express.Application, defaultPath?: string) {
     this.handler = config.handler;
     this.port = config.port ?? DefaultPort;
     this.context = config.context || {} as Context;
     this.enableCORS = config.enableCORS ?? true;
     this.binaryContentTypesOverride = new Set(config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders);
     this.pathParamsPattern = config.pathParamsPattern ?? DefaultPathParamsPattern;
-    this.app = express();
+    this.app = app || express();
+    this.defaultPath = defaultPath ?? DefaultPathParamsPattern;
     this.requestContext = config.requestContext ?? {};
   }
 
-  run(): void {
-    this.app.all(`${this.pathParamsPattern}*`,async (request: Request, response: Response) => {
+  createServer(): void {
+    const router = express.Router();
+    this.app.use(this.defaultPath, router);
+
+    router.all(`${this.pathParamsPattern}`, async (request: Request, response: Response) => {
       // create a copy of requestContext to avoid accidental mutation
       const copyOfRequestContext = cloneDeep(this.requestContext);
       const data: Buffer[] = [];
@@ -84,6 +89,10 @@ export class LocalLambda {
 
     });
 
+  }
+
+  run(): void {
+    this.createServer();
     this.app.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
 
@@ -96,13 +105,47 @@ export class LocalLambda {
 
 }
 
-export interface LocalLambdaConfig {
+
+export interface LambdaConfig {
   handler: LambdaHandler;
-  port?: number;
   context?: Context;
   enableCORS?: boolean;
   // default binary content-type headers or override
   binaryContentTypesOverride?: string[];
   pathParamsPattern ?: string;
   requestContext?: Record<string, any>;
+}
+
+// extend the LambdaConfig to add port
+export interface LocalLambdaConfig extends LambdaConfig {
+  port?: number;
+}
+
+export interface LocalLambdaGroupConfig {
+  lambdas: LambdaConfig[];
+  port?: number;
+  defaultPath?: string;
+}
+
+export class LocalLambdaGroup {
+  lambdas: LambdaConfig[] = [];
+  app: express.Application;
+  port: number;
+  defaultPath: string;
+
+  constructor(config: LocalLambdaGroupConfig) {
+    this.lambdas = config.lambdas;
+    this.app = express();
+    this.port = config.port ?? DefaultPort;
+    this.defaultPath = config.defaultPath ?? DefaultPathParamsPattern;
+  }
+
+  run(): void {
+    this.lambdas.forEach(lambda => {
+      const localLambda = new LocalLambda(lambda, this.app, this.defaultPath);
+      localLambda.createServer();
+      this.app = localLambda.app;
+    });
+    this.app.listen(this.port, () => console.info(`🚀  Lambda Group Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
+  }
 }
