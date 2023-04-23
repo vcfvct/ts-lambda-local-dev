@@ -26,6 +26,6 @@ const config: LocalLambdaConfig = {
   pathParamsPattern: '/user/:id', // optional, default to '/'
 };
 
-// visit http://localhost:8080/user/1234567890 to see the response
+// visit http://localhost:8000/user/1234567890 to see the response
 const localLambda = new LocalLambda(config);
 localLambda.run();
