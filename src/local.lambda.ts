@@ -3,8 +3,7 @@ import * as url from 'url';
 import HTTPMethod from 'http-method-enum';
 import { LambdaHandler, RequestEvent } from './types';
 import express, { Request, Response } from 'express';
-import { flattenArraysInJSON } from './utils';
-import _ from 'lodash';
+import { flattenArraysInJSON, cloneDeep } from './utils';
 const DefaultPort = 8000;
 
 // binary upload content-type headers
@@ -43,7 +42,7 @@ export class LocalLambda {
   run(): void {
     this.app.all(`${this.pathParamsPattern}*`,async (request: Request, response: Response) => {
       // create a copy of requestContext to avoid accidental mutation
-      const copyOfRequestContext = _.cloneDeep(this.requestContext);
+      const copyOfRequestContext = cloneDeep(this.requestContext);
       const data: Buffer[] = [];
       const parsedUrl = url.parse(request.url!, true);
 
