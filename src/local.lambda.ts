@@ -3,7 +3,7 @@ import * as url from 'url';
 import HTTPMethod from 'http-method-enum';
 import { LambdaHandler, RequestEvent } from './types';
 import express, { Request, Response } from 'express';
-import { flattenArraysInJSON } from './utils';
+import { flattenArraysInJSON, cloneDeep } from './utils';
 const DefaultPort = 8000;
 
 // binary upload content-type headers
@@ -26,6 +26,7 @@ export class LocalLambda {
   binaryContentTypesOverride: Set<string>;
   pathParamsPattern: string;
   app: express.Application;
+  requestContext: Record<string, any>;
 
   constructor(config: LocalLambdaConfig) {
     this.handler = config.handler;
@@ -35,10 +36,13 @@ export class LocalLambda {
     this.binaryContentTypesOverride = new Set(config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders);
     this.pathParamsPattern = config.pathParamsPattern ?? DefaultPathParamsPattern;
     this.app = express();
+    this.requestContext = config.requestContext ?? {};
   }
 
   run(): void {
     this.app.all(`${this.pathParamsPattern}*`,async (request: Request, response: Response) => {
+      // create a copy of requestContext to avoid accidental mutation
+      const copyOfRequestContext = cloneDeep(this.requestContext);
       const data: Buffer[] = [];
       const parsedUrl = url.parse(request.url!, true);
 
@@ -67,6 +71,7 @@ export class LocalLambda {
           body: isBinaryUpload ? body.toString('base64') : body.toString('utf8'),
           isBase64Encoded: isBinaryUpload ? true : false,
           pathParameters: request.params,
+          requestContext: copyOfRequestContext,
         };
         const rs = await this.handler(req, this.context);
         // for simple requests' CORS header
@@ -99,4 +104,5 @@ export interface LocalLambdaConfig {
   // default binary content-type headers or override
   binaryContentTypesOverride?: string[];
   pathParamsPattern ?: string;
+  requestContext?: Record<string, any>;
 }

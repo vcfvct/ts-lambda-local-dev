@@ -11,3 +11,7 @@ export function flattenArraysInJSON(json: Record<string, any>): Record<string, a
   }
   return flattenedJson;
 }
+
+export function cloneDeep<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
