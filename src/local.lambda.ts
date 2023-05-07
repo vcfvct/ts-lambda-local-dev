@@ -4,7 +4,8 @@ import HTTPMethod from 'http-method-enum';
 import { LambdaHandler, RequestEvent } from './types';
 import express, { Request, Response } from 'express';
 import { flattenArraysInJSON, cloneDeep } from './utils';
-const DefaultPort = 8000;
+import { LambdaConfig } from './lambda.group';
+export const DefaultPort = 8000;
 
 // binary upload content-type headers
 const defaultBinaryContentTypeHeaders = [
@@ -16,7 +17,7 @@ const defaultBinaryContentTypeHeaders = [
   'application/zip',
 ];
 
-const DefaultPathParamsPattern = '/';
+export const DefaultPathParamsPattern = '/';
 
 export class LocalLambda {
   handler: LambdaHandler;
@@ -25,22 +26,27 @@ export class LocalLambda {
   enableCORS: boolean;
   binaryContentTypesOverride: Set<string>;
   pathParamsPattern: string;
+  defaultPath: string;
   app: express.Application;
   requestContext: Record<string, any>;
 
-  constructor(config: LocalLambdaConfig) {
+  constructor(config: LocalLambdaConfig, app?: express.Application, defaultPath?: string) {
     this.handler = config.handler;
     this.port = config.port ?? DefaultPort;
     this.context = config.context || {} as Context;
     this.enableCORS = config.enableCORS ?? true;
     this.binaryContentTypesOverride = new Set(config.binaryContentTypesOverride ?? defaultBinaryContentTypeHeaders);
     this.pathParamsPattern = config.pathParamsPattern ?? DefaultPathParamsPattern;
-    this.app = express();
+    this.app = app || express();
+    this.defaultPath = defaultPath ?? DefaultPathParamsPattern;
     this.requestContext = config.requestContext ?? {};
   }
 
-  run(): void {
-    this.app.all(`${this.pathParamsPattern}*`,async (request: Request, response: Response) => {
+  createRoute(): void {
+    const router = express.Router();
+    this.app.use(this.defaultPath, router);
+
+    router.all(`${this.pathParamsPattern}`, async (request: Request, response: Response) => {
       // create a copy of requestContext to avoid accidental mutation
       const copyOfRequestContext = cloneDeep(this.requestContext);
       const data: Buffer[] = [];
@@ -84,6 +90,10 @@ export class LocalLambda {
 
     });
 
+  }
+
+  run(): void {
+    this.createRoute();
     this.app.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
 
@@ -96,13 +106,7 @@ export class LocalLambda {
 
 }
 
-export interface LocalLambdaConfig {
-  handler: LambdaHandler;
+// extend the LambdaConfig to add port
+export interface LocalLambdaConfig extends LambdaConfig {
   port?: number;
-  context?: Context;
-  enableCORS?: boolean;
-  // default binary content-type headers or override
-  binaryContentTypesOverride?: string[];
-  pathParamsPattern ?: string;
-  requestContext?: Record<string, any>;
 }
