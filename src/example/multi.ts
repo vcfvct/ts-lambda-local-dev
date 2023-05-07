@@ -52,6 +52,6 @@ const multiConfig: LocalLambdaGroupConfig = {
   defaultPath: '/api/v1', // optional, default to '/'
 };
 
-// visit http://localhost:8008/user/1234567890 to see the response
+// visit http://localhost:8008/api/v1/user/1234567890 and http://localhost:8008/api/v1/user/1234567890/funny to see the response
 const localLambdaGroup = new LocalLambdaGroup(multiConfig);
 localLambdaGroup.run();

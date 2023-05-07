@@ -37,8 +37,7 @@ export class LocalLambdaGroup {
   run(): void {
     this.lambdas.forEach(lambda => {
       const localLambda = new LocalLambda(lambda, this.app, this.defaultPath);
-      localLambda.createServer();
-      this.app = localLambda.app;
+      localLambda.createRoute();
     });
     this.app.listen(this.port, () => console.info(`🚀  Lambda Group Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }

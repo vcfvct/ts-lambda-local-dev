@@ -42,7 +42,7 @@ export class LocalLambda {
     this.requestContext = config.requestContext ?? {};
   }
 
-  createServer(): void {
+  createRoute(): void {
     const router = express.Router();
     this.app.use(this.defaultPath, router);
 
@@ -93,7 +93,7 @@ export class LocalLambda {
   }
 
   run(): void {
-    this.createServer();
+    this.createRoute();
     this.app.listen(this.port, () => console.info(`🚀  Server ready at http://localhost:${this.port} at '${new Date().toLocaleString()}'`));
   }
 
