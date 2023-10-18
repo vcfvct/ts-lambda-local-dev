@@ -68,7 +68,6 @@ export class LocalLambda {
         const req: RequestEvent = {
           path: parsedUrl.pathname!,
           httpMethod: request.method as HTTPMethod,
-          method: request.method,
           headers: request.headers,
           /* if duplicate queryParameters are present then API Gateway will flatten them into a comma-separated list
              eg: ?a=1&a=2&a=3 will be parsed as { a: [1,2,3] } by url.parse and flattenArraysInJSON will convert it to { a: '1,2,3' } which is the same behavior as API Gateway

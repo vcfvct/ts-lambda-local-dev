@@ -5,7 +5,6 @@ import { HTTPMethod } from 'http-method-enum';
 export interface RequestEvent {
   requestContext?: any;
   httpMethod?: HTTPMethod;
-  method?: string;
   path: string;
   headers?: IncomingHttpHeaders;
   multiValueHeaders?: { [name: string]: string[] };
